@@ -17,12 +17,14 @@ The dataset used for this analysis are:
 - `deliveries.csv` – Captures information about each delivery.
 
 ### Tools
-- PostgreSQL - Data Cleaning, Data Analysis, Creating reports
+- PostgreSQL - Data Cleaning, Data Analysis
 
 ### Data Cleaning/Preparation
 In the initial data preparation phase, the following tasks were performed:
-1. Database setup and data import.
-2. Data cleaning.
+1. Database setup
+2. Dropping & Creating tables
+3. Data import
+4. Data Cleaning
    
 ![Image 1](https://github.com/user-attachments/assets/a3dbfab8-fd25-4b6e-8763-f5d4c99085a7)
 
