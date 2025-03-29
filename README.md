@@ -3,13 +3,18 @@
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Results/ Findings](#results-findings)
-- 
+  
 ### Project Overview
 This data analysis project focuses on extracting insights from a food delivery company’s dataset. It involves database setup, data import, handling missing values, and addressing key business challenges through advanced SQL queries.
 
 
 ### Data Sources
-Sales Data: The primary dataset used for this analysis is the "car_sales.csv" file, which contains detailed information about each car sold.
+The dataset used for this analysis are:
+- `customers.csv` – Contains information about each customer.
+- `restaurants.csv` – Stores details about the restaurants.
+- `orders.csv` – Records detailed information on customer orders.
+- `riders.csv` – Includes key details about the riders.
+- `deliveries.csv` – Captures information about each delivery.
 
 ### Tools
 - PostgreSQL - Data Cleaning, Data Analysis, Creating reports
@@ -27,7 +32,7 @@ In the initial data preparation phase, the following tasks were performed:
 CREATE DATABASE zomato_db;
 ```
 
-### 2. Dropping Existing Tables
+### 2. Dropping Existing & Creating Tables
 ```sql
 DROP TABLE IF EXISTS deliveries;
 DROP TABLE IF EXISTS Orders;
@@ -35,48 +40,64 @@ DROP TABLE IF EXISTS customers;
 DROP TABLE IF EXISTS restaurants;
 DROP TABLE IF EXISTS riders;
 
--- 2. Creating Tables
-CREATE TABLE restaurants (
-    restaurant_id SERIAL PRIMARY KEY,
-    restaurant_name VARCHAR(100) NOT NULL,
-    city VARCHAR(50),
-    opening_hours VARCHAR(50)
-);
+-- Creating Tables
+CREATE TABLE customers
+	(
+	customer_id INT PRIMARY KEY,
+	customer_name VARCHAR(25),
+	reg_date DATE
+	);
 
-CREATE TABLE customers (
-    customer_id SERIAL PRIMARY KEY,
-    customer_name VARCHAR(100) NOT NULL,
-    reg_date DATE
-);
+CREATE TABLE restaurants
+	(
+	restaurant_id INT PRIMARY KEY,
+	restaurant_name VARCHAR(55),
+	city VARCHAR(15),
+	opening_hours VARCHAR(55)
+	);
 
-CREATE TABLE riders (
-    rider_id SERIAL PRIMARY KEY,
-    rider_name VARCHAR(100) NOT NULL,
-    sign_up DATE
-);
+CREATE TABLE orders
+	(
+	order_id INT PRIMARY KEY,
+	customer_id INT, -- coming from customers table
+	restaurant_id INT, -- coming from restaurants table
+	order_item VARCHAR(55),
+	order_date DATE,
+	order_time TIME,
+	order_status VARCHAR(55),
+	total_amount FLOAT
+	);
 
-CREATE TABLE Orders (
-    order_id SERIAL PRIMARY KEY,
-    customer_id INT,
-    restaurant_id INT,
-    order_item VARCHAR(255),
-    order_date DATE NOT NULL,
-    order_time TIME NOT NULL,
-    order_status VARCHAR(20) DEFAULT 'Pending',
-    total_amount DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
-    FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
-);
+-- adding FK CONSTRAINT
+ALTER TABLE orders
+ADD CONSTRAINT fk_customers
+FOREIGN KEY (customer_id)
+REFERENCES customers(customer_id);
 
-CREATE TABLE deliveries (
-    delivery_id SERIAL PRIMARY KEY,
-    order_id INT,
-    delivery_status VARCHAR(20) DEFAULT 'Pending',
-    delivery_time TIME,
-    rider_id INT,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
-    FOREIGN KEY (rider_id) REFERENCES riders(rider_id)
-);
+-- adding FK CONSTRAINT
+ALTER TABLE orders
+ADD CONSTRAINT fk_restaurants
+FOREIGN KEY (restaurant_id)
+REFERENCES restaurants(restaurant_id);
+
+
+CREATE TABLE riders
+	(
+	rider_id INT PRIMARY KEY,
+	rider_name VARCHAR (55),
+	sign_up DATE
+	);
+
+CREATE TABLE deliveries
+	(
+	delivery_id INT PRIMARY KEY,
+	order_id INT, -- coming from the orders table
+	delivery_status	VARCHAR(35),
+	delivery_time TIME,
+	rider_id INT, -- coming from the riders table
+	CONSTRAINT fk_orders FOREIGN KEY (order_id) REFERENCES orders(order_id),
+	CONSTRAINT fk_riders FOREIGN KEY (rider_id) REFERENCES riders(rider_id)
+	);
 ```
 
 ### 3. Data Import
