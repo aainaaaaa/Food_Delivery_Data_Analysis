@@ -18,17 +18,135 @@ Sales Data: The primary dataset used for this analysis is the "car_sales.csv" fi
 In the initial data preparation phase, the following tasks were performed:
 1. Database setup and data import.
 2. Data cleaning.
+   
+![Image 1](https://github.com/user-attachments/assets/a3dbfab8-fd25-4b6e-8763-f5d4c99085a7)
 
-### Exploratory Data Analysis
-EDA involved exploring the sales data to answer key questions, such as:
-- How are the total sales performance?
-- How has the average selling price changed over time?
-- How many cars have been sold, and what are the trends (body style, color, and region)?
-- Which dealer regions and companies are driving or lagging in sales?
-### Dashboard Overview
-![Car Sales Background](https://github.com/user-attachments/assets/4b70b161-6915-4f22-8565-577acb292754)
-![Screenshot 2025-03-27 150830](https://github.com/user-attachments/assets/bb4e0535-6f39-4368-8e6d-2b103c4643ad)
 
+### 1. Database Setup
+```sql
+CREATE DATABASE zomato_db;
+```
+
+### 2. Dropping Existing Tables
+```sql
+DROP TABLE IF EXISTS deliveries;
+DROP TABLE IF EXISTS Orders;
+DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS restaurants;
+DROP TABLE IF EXISTS riders;
+
+-- 2. Creating Tables
+CREATE TABLE restaurants (
+    restaurant_id SERIAL PRIMARY KEY,
+    restaurant_name VARCHAR(100) NOT NULL,
+    city VARCHAR(50),
+    opening_hours VARCHAR(50)
+);
+
+CREATE TABLE customers (
+    customer_id SERIAL PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    reg_date DATE
+);
+
+CREATE TABLE riders (
+    rider_id SERIAL PRIMARY KEY,
+    rider_name VARCHAR(100) NOT NULL,
+    sign_up DATE
+);
+
+CREATE TABLE Orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT,
+    restaurant_id INT,
+    order_item VARCHAR(255),
+    order_date DATE NOT NULL,
+    order_time TIME NOT NULL,
+    order_status VARCHAR(20) DEFAULT 'Pending',
+    total_amount DECIMAL(10, 2) NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
+    FOREIGN KEY (restaurant_id) REFERENCES restaurants(restaurant_id)
+);
+
+CREATE TABLE deliveries (
+    delivery_id SERIAL PRIMARY KEY,
+    order_id INT,
+    delivery_status VARCHAR(20) DEFAULT 'Pending',
+    delivery_time TIME,
+    rider_id INT,
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    FOREIGN KEY (rider_id) REFERENCES riders(rider_id)
+);
+```
+
+### 3. Data Import
+Importing datasets in the following order (*refer to ERD diagram*)
+- `customers.csv`
+- `restaurants.csv`
+- `orders.csv`
+- `riders.csv`
+- `deliveries.csv`
+
+### 4. Data Cleaning and Handling Null Values
+```sql
+-- Checking for null value
+SELECT COUNT(*)
+FROM customers
+WHERE
+	customer_name IS NULL
+	OR
+	reg_date IS NULL
+
+SELECT COUNT(*)
+FROM restaurants 
+WHERE
+	restaurant_name IS NULL
+	OR
+	city IS NULL
+	OR
+	opening_hours IS NULL
+
+SELECT COUNT(*)
+FROM orders 
+WHERE
+	order_item IS NULL
+	OR
+	order_date IS NULL
+	OR
+	order_time IS NULL
+	OR
+	order_status IS NULL
+	OR
+	total_amount IS NULL
+
+SELECT COUNT(*)
+FROM riders 
+WHERE
+	rider_name IS NULL
+	OR
+	sign_up IS NULL
+
+SELECT COUNT(*)
+FROM deliveries 
+WHERE
+	delivery_status IS NULL
+	OR
+	delivery_time IS NULL
+
+-- Deleting null values
+DELETE
+FROM orders 
+WHERE
+	order_item IS NULL
+	OR
+	order_date IS NULL
+	OR
+	order_time IS NULL
+	OR
+	order_status IS NULL
+	OR
+	total_amount IS NULL
+```
 ### Results/ Findings
 The analysis results were summarized as follows:
 1. Total sales have grown by 23.59% compared to the previous year.
